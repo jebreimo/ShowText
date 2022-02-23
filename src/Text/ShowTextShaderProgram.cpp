@@ -12,17 +12,17 @@
 void ShowTextShaderProgram::setup()
 {
     using namespace Tungsten;
-    program = createProgram();
-    auto vertexShader = createShader(GL_VERTEX_SHADER, ShowText_vert);
-    attachShader(program, vertexShader);
-    auto fragmentShader = createShader(GL_FRAGMENT_SHADER, ShowText_frag);
-    attachShader(program, fragmentShader);
-    linkProgram(program);
-    useProgram(program);
+    program = create_program();
+    auto vertex_shader = create_shader(GL_VERTEX_SHADER, ShowText_vert);
+    attach_shader(program, vertex_shader);
+    auto fragment_shader = create_shader(GL_FRAGMENT_SHADER, ShowText_frag);
+    attach_shader(program, fragment_shader);
+    link_program(program);
+    use_program(program);
 
-    position = Tungsten::getVertexAttribute(program, "a_Position");
-    textureCoord = Tungsten::getVertexAttribute(program, "a_TextureCoord");
+    position = Tungsten::get_vertex_attribute(program, "a_Position");
+    texture_coord = Tungsten::get_vertex_attribute(program, "a_TextureCoord");
 
-    mvpMatrix = Tungsten::getUniform<Xyz::Matrix4f>(program, "u_MvpMatrix");
-    texture = Tungsten::getUniform<GLint>(program, "u_Texture");
+    mvp_matrix = Tungsten::get_uniform<Xyz::Matrix4f>(program, "u_MvpMatrix");
+    texture = Tungsten::get_uniform<GLint>(program, "u_Texture");
 }

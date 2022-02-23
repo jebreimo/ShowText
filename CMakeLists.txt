@@ -13,13 +13,13 @@ include(FetchContent)
 
 if (DEFINED LOCAL_SOURCE_PACKAGE_DIR)
     FetchContent_Declare(tungsten
-        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Tungsten-0.1.3.5.tar.gz")
+        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Tungsten-0.2.3.tar.gz")
     FetchContent_Declare(yimage
-        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Yimage-0.0.5.tar.gz")
+        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Yimage-0.0.6.tar.gz")
 else ()
     FetchContent_Declare(tungsten
         GIT_REPOSITORY "https://github.com/jebreimo/Tungsten.git"
-        GIT_TAG v0.1.3)
+        GIT_TAG v0.2.3)
     FetchContent_Declare(yimage
         GIT_REPOSITORY "https://github.com/jebreimo/Yimage.git"
         GIT_TAG main)
@@ -28,8 +28,14 @@ endif ()
 FetchContent_Declare(argos
     GIT_REPOSITORY "https://github.com/jebreimo/Argos.git"
     GIT_TAG master)
+FetchContent_Declare(ystring2
+    GIT_REPOSITORY "https://github.com/jebreimo/Ystring2.git"
+    GIT_TAG master)
+FetchContent_Declare(yson
+    GIT_REPOSITORY "https://github.com/jebreimo/Yson.git"
+    GIT_TAG master)
 
-FetchContent_MakeAvailable(argos tungsten yimage)
+FetchContent_MakeAvailable(argos tungsten yimage yson ystring2)
 
 list(APPEND CMAKE_MODULE_PATH ${tungsten_SOURCE_DIR}/tools/cmake)
 
@@ -39,13 +45,15 @@ add_executable(Text
     src/Text/ShowTextShaderProgram.cpp
     src/Text/ShowTextShaderProgram.hpp
     src/Text/main.cpp
-    )
+    src/Text/BitmapFont.cpp src/Text/BitmapFont.hpp src/Text/GlFont.cpp src/Text/GlFont.cpp src/Text/GlFont.hpp)
 
 target_link_libraries(Text
     PRIVATE
         Argos::Argos
         Tungsten::Tungsten
         Yimage::Yimage
+        Yson::Yson
+        Ystring2::Ystring
     )
 
 tungsten_target_embed_shaders(Text

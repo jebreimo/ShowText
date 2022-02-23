@@ -7,7 +7,7 @@
 //****************************************************************************
 #version 100
 
-attribute vec3 a_Position;
+attribute vec2 a_Position;
 attribute vec2 a_TextureCoord;
 
 uniform mat4 u_MvpMatrix;
@@ -16,6 +16,6 @@ varying highp vec2 v_TextureCoord;
 
 void main()
 {
-    gl_Position = u_MvpMatrix * vec4(a_Position, 1);
+    gl_Position = vec4(a_Position, 0, 1);
     v_TextureCoord = a_TextureCoord;
 }
