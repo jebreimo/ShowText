@@ -15,7 +15,7 @@ public:
 
     Tungsten::ProgramHandle program;
 
-    Tungsten::Uniform<Xyz::Matrix4f> mvp_matrix;
+    Tungsten::Uniform<Xyz::Matrix4F> mvp_matrix;
     Tungsten::Uniform<GLint> texture;
 
     GLuint position;

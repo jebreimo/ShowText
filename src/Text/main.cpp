@@ -55,7 +55,10 @@ public:
         SDL_GetWindowSize(app.window(), &w, &h);
 
         font_ = make_gl_font(std::move(bmp_font_), {float(w), float(h)});
-        auto buffer = format_text(font_, "ABC", {0, 0});
+        auto text_size = get_text_size(font_, text_);
+        auto origin = Xyz::make_vector2(-text_size.size()[0] / 2.f,
+                                        -text_size.size()[1] / 2.f - text_size.min()[1]);
+        auto buffer = format_text(font_, text_, origin);
         std::cout << buffer << '\n';
         m_count = int32_t(buffer.indexes.size());
         m_vertex_array = Tungsten::generate_vertex_array();
@@ -101,7 +104,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Tungsten::draw_elements(GL_TRIANGLES, m_count, GL_UNSIGNED_SHORT);
     }
-
 private:
     BitmapFont bmp_font_;
     GlFont font_;
@@ -156,9 +158,6 @@ int main(int argc, char* argv[])
 
         auto [lo, hi] = bmp_font.vertical_extremes();
         std::cout << lo << ", " << hi << "\n";
-
-        //auto gl_font = make_gl_font(std::move(bmp_font), {1280, 1024});
-        //std::cout << format_text(gl_font, "ABC", {0, 0}) << "\n";
 
         auto event_loop = std::make_unique<ShowText>(
             std::move(bmp_font),

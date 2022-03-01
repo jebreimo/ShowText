@@ -8,17 +8,18 @@
 #pragma once
 #include <unordered_map>
 #include <Tungsten/ArrayBuffer.hpp>
+#include <Xyz/Rectangle.hpp>
 #include <Xyz/Vector.hpp>
 #include <Yimage/Image.hpp>
 #include "BitmapFont.hpp"
 
 struct GlCharData
 {
-    Xyz::Vector2f size;
-    Xyz::Vector2f bearing;
+    Xyz::Vector2F size;
+    Xyz::Vector2F bearing;
     float advance = {};
-    Xyz::Vector2f tex_origin;
-    Xyz::Vector2f tex_size;
+    Xyz::Vector2F tex_origin;
+    Xyz::Vector2F tex_size;
 };
 
 class GlFont
@@ -39,12 +40,12 @@ private:
     yimage::Image image_;
 };
 
-GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2f screen_size);
+GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size);
 
 struct TextVertex
 {
-    Xyz::Vector2f pos;
-    Xyz::Vector2f texture;
+    Xyz::Vector2F pos;
+    Xyz::Vector2F texture;
 };
 
 std::ostream& operator<<(std::ostream& os, const TextVertex& vertex);
@@ -52,7 +53,9 @@ std::ostream& operator<<(std::ostream& os, const TextVertex& vertex);
 std::ostream&
 operator<<(std::ostream& os, const Tungsten::ArrayBuffer<TextVertex>& buffer);
 
+Xyz::RectangleF get_text_size(const GlFont& font, std::string_view text);
+
 Tungsten::ArrayBuffer<TextVertex>
 format_text(const GlFont& font,
             std::string_view text,
-            const Xyz::Vector2f& origin);
+            const Xyz::Vector2F& origin);

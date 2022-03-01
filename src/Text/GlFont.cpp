@@ -28,7 +28,7 @@ const yimage::Image& GlFont::image() const
     return image_;
 }
 
-GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2f screen_size)
+GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size)
 {
     std::unordered_map<char32_t, GlCharData> char_data;
     const auto& img = bitmap_font.image();
@@ -73,12 +73,12 @@ operator<<(std::ostream& os,
 }
 
 void add_rectangle(Tungsten::ArrayBufferBuilder<TextVertex> builder,
-                   const Xyz::Vector2f& origin,
-                   const Xyz::Vector2f& size,
-                   const Xyz::Vector2f& tex_origin,
-                   const Xyz::Vector2f& tex_size)
+                   const Xyz::Vector2F& origin,
+                   const Xyz::Vector2F& size,
+                   const Xyz::Vector2F& tex_origin,
+                   const Xyz::Vector2F& tex_size)
 {
-    using V = Xyz::Vector2f;
+    using V = Xyz::Vector2F;
 
     builder.reserve_vertexes(4);
     builder.add_vertex({origin, tex_origin});
@@ -95,9 +95,8 @@ void add_rectangle(Tungsten::ArrayBufferBuilder<TextVertex> builder,
 void format_text(Tungsten::ArrayBuffer<TextVertex>& buffer,
                  const GlFont& font,
                  std::string_view text,
-                 Xyz::Vector2f origin)
+                 Xyz::Vector2F origin)
 {
-    using V = Xyz::Vector2f;
     for (const auto c: ystring::to_utf32(text))
     {
         auto cdata = font.char_data(c);
@@ -113,10 +112,30 @@ void format_text(Tungsten::ArrayBuffer<TextVertex>& buffer,
     }
 }
 
+Xyz::RectangleF get_text_size(const GlFont& font, std::string_view text)
+{
+    Xyz::Vector2F min, max;
+
+    for (const auto c: ystring::to_utf32(text))
+    {
+        auto cdata = font.char_data(c);
+        if (!cdata)
+            continue;
+        max[0] += cdata->advance;
+        auto hi = cdata->bearing[1];
+        if (hi > max[1])
+            max[1] = hi;
+        auto lo = cdata->size[1] - cdata->bearing[1];
+        if (lo < min[1])
+            min[1] = lo;
+    }
+    return {min, max - min};
+}
+
 Tungsten::ArrayBuffer<TextVertex>
 format_text(const GlFont& font,
             std::string_view text,
-            const Xyz::Vector2f& origin)
+            const Xyz::Vector2F& origin)
 {
     Tungsten::ArrayBuffer<TextVertex> result;
     format_text(result, font, text, origin);

@@ -13,13 +13,13 @@ include(FetchContent)
 
 if (DEFINED LOCAL_SOURCE_PACKAGE_DIR)
     FetchContent_Declare(tungsten
-        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Tungsten-0.2.3.tar.gz")
+        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Tungsten-0.2.4.tar.gz")
     FetchContent_Declare(yimage
         URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Yimage-0.0.6.tar.gz")
 else ()
     FetchContent_Declare(tungsten
         GIT_REPOSITORY "https://github.com/jebreimo/Tungsten.git"
-        GIT_TAG v0.2.3)
+        GIT_TAG v0.2.4)
     FetchContent_Declare(yimage
         GIT_REPOSITORY "https://github.com/jebreimo/Yimage.git"
         GIT_TAG main)

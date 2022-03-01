@@ -54,4 +54,4 @@ BitmapFont read_font(const std::string& font_path);
 //Tungsten::ArrayBuffer<TextVertex>
 //format_text(const BitmapFont& font,
 //            std::string_view text,
-//            const Xyz::Vector2f& origin);
+//            const Xyz::Vector2F& origin);
