@@ -67,12 +67,12 @@ public:
                                         -text_size.size()[1] / 2.f - text_size.min()[1]);
         auto buffer = format_text(font_, text_, origin);
         std::cout << buffer << '\n';
-        m_count = int32_t(buffer.indexes.size());
-        m_vertex_array = Tungsten::generate_vertex_array();
-        Tungsten::bind_vertex_array(m_vertex_array);
-        m_buffers = Tungsten::generate_buffers(2);
-        set_buffers(m_buffers[0], m_buffers[1], buffer);
-        m_program.setup();
+        count_ = int32_t(buffer.indexes.size());
+        vertex_array_ = Tungsten::generate_vertex_array();
+        Tungsten::bind_vertex_array(vertex_array_);
+        buffers_ = Tungsten::generate_buffers(2);
+        set_buffers(buffers_[0], buffers_[1], buffer);
+        program_.setup();
         Tungsten::set_texture_min_filter(GL_TEXTURE_2D, GL_LINEAR);
         Tungsten::set_texture_mag_filter(GL_TEXTURE_2D, GL_LINEAR);
         Tungsten::set_texture_parameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -86,14 +86,14 @@ public:
                                        format, type,
                                        image.data());
 
-        m_program.setup();
+        program_.setup();
         Tungsten::define_vertex_attribute_pointer(
-            m_program.position, 2, GL_FLOAT, false, 4 * sizeof(float), 0);
-        Tungsten::enable_vertex_attribute(m_program.position);
+            program_.position, 2, GL_FLOAT, false, 4 * sizeof(float), 0);
+        Tungsten::enable_vertex_attribute(program_.position);
         Tungsten::define_vertex_attribute_pointer(
-            m_program.texture_coord, 2, GL_FLOAT, false, 4 * sizeof(float),
+            program_.texture_coord, 2, GL_FLOAT, false, 4 * sizeof(float),
             2 * sizeof(float));
-        Tungsten::enable_vertex_attribute(m_program.texture_coord);
+        Tungsten::enable_vertex_attribute(program_.texture_coord);
 
         auto m = float(std::min(w, h));
         auto projection = Xyz::make_frustum_matrix<float>(-1, 1, -1, 1, 1, 5)
@@ -102,23 +102,23 @@ public:
                                                   Xyz::make_vector3<float>(0, 1, 0))
                           * Xyz::scale4<float>(float(h) / m, float(w) / m, 1.f);
 
-        m_program.mvp_matrix.set(projection);
+        program_.mvp_matrix.set(projection);
     }
 
     void on_draw(Tungsten::SdlApplication& app) override
     {
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Tungsten::draw_elements(GL_TRIANGLES, m_count, GL_UNSIGNED_SHORT);
+        Tungsten::draw_elements(GL_TRIANGLES, count_, GL_UNSIGNED_SHORT);
     }
 private:
     BitmapFont bmp_font_;
     GlFont font_;
     std::string text_;
-    std::vector<Tungsten::BufferHandle> m_buffers;
-    Tungsten::VertexArrayHandle m_vertex_array;
-    ShowTextShaderProgram m_program;
-    int32_t m_count = 0;
+    std::vector<Tungsten::BufferHandle> buffers_;
+    Tungsten::VertexArrayHandle vertex_array_;
+    ShowTextShaderProgram program_;
+    int32_t count_ = 0;
 };
 
 std::pair<std::string, std::string>
