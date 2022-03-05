@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(Text)
+project(ShowText)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -28,11 +28,11 @@ endif ()
 FetchContent_Declare(argos
     GIT_REPOSITORY "https://github.com/jebreimo/Argos.git"
     GIT_TAG master)
-FetchContent_Declare(ystring2
-    GIT_REPOSITORY "https://github.com/jebreimo/Ystring2.git"
-    GIT_TAG master)
 FetchContent_Declare(yson
     GIT_REPOSITORY "https://github.com/jebreimo/Yson.git"
+    GIT_TAG master)
+FetchContent_Declare(ystring2
+    GIT_REPOSITORY "https://github.com/jebreimo/Ystring2.git"
     GIT_TAG master)
 
 FetchContent_MakeAvailable(argos tungsten yimage yson ystring2)
@@ -41,13 +41,17 @@ list(APPEND CMAKE_MODULE_PATH ${tungsten_SOURCE_DIR}/tools/cmake)
 
 include(TungstenTargetEmbedShaders)
 
-add_executable(Text
-    src/Text/ShowTextShaderProgram.cpp
-    src/Text/ShowTextShaderProgram.hpp
-    src/Text/main.cpp
-    src/Text/BitmapFont.cpp src/Text/BitmapFont.hpp src/Text/GlFont.cpp src/Text/GlFont.cpp src/Text/GlFont.hpp)
+add_executable(ShowText
+    src/ShowText/ShowTextShaderProgram.cpp
+    src/ShowText/ShowTextShaderProgram.hpp
+    src/ShowText/main.cpp
+    src/ShowText/BitmapFont.cpp
+    src/ShowText/BitmapFont.hpp
+    src/ShowText/GlFont.cpp
+    src/ShowText/GlFont.hpp
+    )
 
-target_link_libraries(Text
+target_link_libraries(ShowText
     PRIVATE
         Argos::Argos
         Tungsten::Tungsten
@@ -56,8 +60,8 @@ target_link_libraries(Text
         Ystring2::Ystring
     )
 
-tungsten_target_embed_shaders(Text
+tungsten_target_embed_shaders(ShowText
     FILES
-        src/Text/ShowText-frag.glsl
-        src/Text/ShowText-vert.glsl
+        src/ShowText/ShowText-frag.glsl
+        src/ShowText/ShowText-vert.glsl
     )

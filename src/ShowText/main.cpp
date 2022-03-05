@@ -1,9 +1,16 @@
+//****************************************************************************
+// Copyright © 2021 Jan Erik Breimo. All rights reserved.
+// Created by Jan Erik Breimo on 2021-12-01.
+//
+// This file is distributed under the BSD License.
+// License text is included with the source distribution.
+//****************************************************************************
 #include <filesystem>
 #include <iostream>
 #include <Argos/Argos.hpp>
 #include <Tungsten/SdlApplication.hpp>
-#include <Ystring/Ystring.hpp>
 #include <Yimage/Yimage.hpp>
+#include <Ystring/Ystring.hpp>
 #include "BitmapFont.hpp"
 #include "ShowTextShaderProgram.hpp"
 #include "GlFont.hpp"
@@ -112,7 +119,6 @@ private:
     Tungsten::VertexArrayHandle m_vertex_array;
     ShowTextShaderProgram m_program;
     int32_t m_count = 0;
-    //float m_percentage = 1.0;
 };
 
 std::pair<std::string, std::string>
