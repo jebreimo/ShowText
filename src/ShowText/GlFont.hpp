@@ -6,6 +6,7 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
+#include <span>
 #include <unordered_map>
 #include <Tungsten/ArrayBuffer.hpp>
 #include <Xyz/Rectangle.hpp>
@@ -42,6 +43,11 @@ private:
 
 GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size);
 
+GlFont make_gl_font(const std::string& font_path,
+                    unsigned font_size,
+                    Xyz::Vector2F screen_size,
+                    std::span<char32_t> chars);
+
 struct TextVertex
 {
     Xyz::Vector2F pos;
@@ -53,9 +59,9 @@ std::ostream& operator<<(std::ostream& os, const TextVertex& vertex);
 std::ostream&
 operator<<(std::ostream& os, const Tungsten::ArrayBuffer<TextVertex>& buffer);
 
-Xyz::RectangleF get_text_size(const GlFont& font, std::string_view text);
+Xyz::RectangleF get_text_size(const GlFont& font, std::u32string_view text);
 
 Tungsten::ArrayBuffer<TextVertex>
 format_text(const GlFont& font,
-            std::string_view text,
+            std::u32string_view text,
             const Xyz::Vector2F& origin);

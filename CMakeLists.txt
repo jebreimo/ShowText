@@ -9,17 +9,19 @@ if (DEFINED LOCAL_SOURCE_PACKAGE_DIR OR DEFINED ENV{LOCAL_SOURCE_PACKAGE_DIR})
     endif ()
 endif ()
 
+find_package(Freetype REQUIRED)
+
 include(FetchContent)
 
 if (DEFINED LOCAL_SOURCE_PACKAGE_DIR)
     FetchContent_Declare(tungsten
-        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Tungsten-0.2.4.tar.gz")
+        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Tungsten-0.2.6.tar.gz")
     FetchContent_Declare(yimage
-        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Yimage-0.0.6.tar.gz")
+        URL "file://${LOCAL_SOURCE_PACKAGE_DIR}/Yimage-0.0.8.tar.gz")
 else ()
     FetchContent_Declare(tungsten
         GIT_REPOSITORY "https://github.com/jebreimo/Tungsten.git"
-        GIT_TAG v0.2.4)
+        GIT_TAG v0.2.6)
     FetchContent_Declare(yimage
         GIT_REPOSITORY "https://github.com/jebreimo/Yimage.git"
         GIT_TAG main)
@@ -42,17 +44,20 @@ list(APPEND CMAKE_MODULE_PATH ${tungsten_SOURCE_DIR}/tools/cmake)
 include(TungstenTargetEmbedShaders)
 
 add_executable(ShowText
-    src/ShowText/ShowTextShaderProgram.cpp
-    src/ShowText/ShowTextShaderProgram.hpp
-    src/ShowText/main.cpp
     src/ShowText/BitmapFont.cpp
     src/ShowText/BitmapFont.hpp
+    src/ShowText/FreeTypeWrapper.cpp
+    src/ShowText/FreeTypeWrapper.hpp
     src/ShowText/GlFont.cpp
     src/ShowText/GlFont.hpp
+    src/ShowText/main.cpp
+    src/ShowText/ShowTextShaderProgram.cpp
+    src/ShowText/ShowTextShaderProgram.hpp
     )
 
 target_link_libraries(ShowText
     PRIVATE
+        Freetype::Freetype
         Argos::Argos
         Tungsten::Tungsten
         Yimage::Yimage

@@ -6,13 +6,14 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #pragma once
-#include <unordered_map>
-#include <Xyz/Vector.hpp>
-#include <Tungsten/ArrayBuffer.hpp>
-#include <string_view>
-#include <Yimage/Image.hpp>
 
-struct CharData
+#include <span>
+#include <unordered_map>
+#include <Yimage/Image.hpp>
+#include <Yson/Reader.hpp>
+#include <Yson/Writer.hpp>
+
+struct BitmapCharData
 {
     unsigned x = 0;
     unsigned y = 0;
@@ -28,14 +29,14 @@ class BitmapFont
 public:
     BitmapFont() = default;
 
-    explicit BitmapFont(std::unordered_map<char32_t, CharData> char_data,
-                        yimage::Image image);
+    BitmapFont(std::unordered_map<char32_t, BitmapCharData> char_data,
+               yimage::Image image);
 
     [[nodiscard]]
-    const CharData* char_data(char32_t ch) const;
+    const BitmapCharData* char_data(char32_t ch) const;
 
     [[nodiscard]]
-    const std::unordered_map<char32_t, CharData>& all_char_data() const;
+    const std::unordered_map<char32_t, BitmapCharData>& all_char_data() const;
 
     [[nodiscard]]
     std::pair<int, int> vertical_extremes() const;
@@ -44,14 +45,16 @@ public:
     const yimage::Image& image() const;
 
     yimage::Image release_image();
+
 private:
-    std::unordered_map<char32_t, CharData> char_data_;
+    std::unordered_map<char32_t, BitmapCharData> char_data_;
     yimage::Image image_;
 };
 
-BitmapFont read_font(const std::string& font_path);
-//
-//Tungsten::ArrayBuffer<TextVertex>
-//format_text(const BitmapFont& font,
-//            std::string_view text,
-//            const Xyz::Vector2F& origin);
+BitmapFont make_bitmap_font(const std::string& font_path,
+                            unsigned font_size,
+                            std::span<char32_t> chars);
+
+BitmapFont read_bitmap_font(const std::string& font_path);
+
+void write_font(const BitmapFont& font, const std::string& file_name);

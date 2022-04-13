@@ -5,8 +5,8 @@
 // This file is distributed under the BSD License.
 // License text is included with the source distribution.
 //****************************************************************************
-#include <filesystem>
 #include <iostream>
+#include <unordered_set>
 #include <Argos/Argos.hpp>
 #include <Tungsten/SdlApplication.hpp>
 #include <Yimage/Yimage.hpp>
@@ -51,7 +51,7 @@ namespace
 class ShowText : public Tungsten::EventLoop
 {
 public:
-    ShowText(BitmapFont font, std::string text)
+    ShowText(BitmapFont font, std::u32string text)
         : bmp_font_(std::move(font)),
           text_(move(text))
     {}
@@ -114,60 +114,69 @@ public:
 private:
     BitmapFont bmp_font_;
     GlFont font_;
-    std::string text_;
+    std::u32string text_;
     std::vector<Tungsten::BufferHandle> buffers_;
     Tungsten::VertexArrayHandle vertex_array_;
     ShowTextShaderProgram program_;
     int32_t count_ = 0;
 };
 
-std::pair<std::string, std::string>
-get_json_and_png_paths(std::filesystem::path path)
+argos::ParsedArguments parse_arguments(int argc, char* argv[])
 {
-    auto extension = ystring::to_lower(path.extension().string());
-    if (extension == ".json")
-    {
-        const auto json_path = path;
-        path.replace_extension(".png");
-        return {json_path.string(), path.string()};
-    }
-    else if (extension == ".png")
-    {
-        const auto png_path = path;
-        path.replace_extension(".json");
-        return {path.string(), png_path.string()};
-    }
-    else
-    {
-        return {path.string() + ".json", path.string() + ".png"};
-    }
+    argos::ArgumentParser parser(argv[0]);
+    parser.about("Creates an OpenGL window where it displays a"
+                 " given text with a given bitmap font.")
+        .add(argos::Argument("TEXT")
+                 .count(1, UINT_MAX)
+                 .help("The text the program will display."))
+        .add(argos::Option{"-b", "--bmpfont"}.argument("PATH")
+                 .help("Path to a bitmap font. This can be either the"
+                       " PNG file, the JSON file, or just the font name"
+                       " without the extension."))
+        .add(argos::Option{"-f", "--font"}.argument("FILE:SIZE")
+                 .help("Path to a font (e.g. the .ttf file) and the size."));
+    Tungsten::SdlApplication::add_command_line_options(parser);
+    return parser.parse(argc, argv);
+}
+
+std::vector<char32_t> get_unique_chars(std::u32string_view str)
+{
+    std::unordered_set<char32_t> chars;
+    for (auto ch : str)
+        chars.insert(ch);
+    return {chars.begin(), chars.end()};
 }
 
 int main(int argc, char* argv[])
 {
     try
     {
-        argos::ArgumentParser parser(argv[0]);
-        parser.about("Creates an OpenGL window where it displays a"
-                     " given text with a given bitmap font.")
-            .add(argos::Argument("FONT")
-                .help("Path to a bitmap font. This can be either the"
-                      " PNG file, the JSON file, or just the font name"
-                      " without the extension."))
-            .add(argos::Argument("TEXT")
-                .count(1, UINT_MAX)
-                .help("The text the program will display."));
-        Tungsten::SdlApplication::add_command_line_options(parser);
-        auto args = parser.parse(argc, argv);
+        auto args = parse_arguments(argc, argv);
+        auto texts = args.values("TEXT").as_strings();
+        auto text8 = ystring::join(texts.begin(), texts.end(), " ");
+        auto text32 = ystring::to_utf32(text8);
+        auto chars = get_unique_chars(text32);
 
-        auto bmp_font = read_font(args.value("FONT").as_string());
-
-        auto [lo, hi] = bmp_font.vertical_extremes();
-        std::cout << lo << ", " << hi << "\n";
+        BitmapFont bmp_font;
+        if (auto bmp_font_arg = args.value("--bmpfont"))
+        {
+            bmp_font = read_bitmap_font(bmp_font_arg.as_string());
+        }
+        else if (auto font_arg = args.value("--font"))
+        {
+            auto parts = font_arg.split(':', 2, 2);
+            bmp_font = make_bitmap_font(parts.value(0).as_string(),
+                                        parts.value(1).as_uint(),
+                                        chars);
+        }
+        else
+        {
+            args.error("No font was specified.");
+        }
 
         auto event_loop = std::make_unique<ShowText>(
             std::move(bmp_font),
-            args.value("TEXT").as_string());
+            text32);
         Tungsten::SdlApplication app("ShowPng", std::move(event_loop));
         app.read_command_line_options(args);
         app.run();
