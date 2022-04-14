@@ -43,11 +43,6 @@ private:
 
 GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size);
 
-GlFont make_gl_font(const std::string& font_path,
-                    unsigned font_size,
-                    Xyz::Vector2F screen_size,
-                    std::span<char32_t> chars);
-
 struct TextVertex
 {
     Xyz::Vector2F pos;

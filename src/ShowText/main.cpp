@@ -66,7 +66,6 @@ public:
         auto origin = Xyz::make_vector2(-text_size.size()[0] / 2.f,
                                         -text_size.size()[1] / 2.f - text_size.min()[1]);
         auto buffer = format_text(font_, text_, origin);
-        std::cout << buffer << '\n';
         count_ = int32_t(buffer.indexes.size());
         vertex_array_ = Tungsten::generate_vertex_array();
         Tungsten::bind_vertex_array(vertex_array_);
