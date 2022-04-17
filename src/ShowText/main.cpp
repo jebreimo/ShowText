@@ -51,7 +51,7 @@ namespace
 class ShowText : public Tungsten::EventLoop
 {
 public:
-    ShowText(BitmapFont font, std::u32string text)
+    ShowText(std::shared_ptr<BitmapFont> font, std::u32string text)
         : bmp_font_(std::move(font)),
           text_(move(text))
     {}
@@ -61,7 +61,7 @@ public:
         int w, h;
         SDL_GetWindowSize(app.window(), &w, &h);
 
-        font_ = make_gl_font(std::move(bmp_font_), {float(w), float(h)});
+        font_ = make_gl_font(bmp_font_, {float(w), float(h)});
         auto text_size = get_text_size(font_, text_);
         auto origin = Xyz::make_vector2(-text_size.size()[0] / 2.f,
                                         -text_size.size()[1] / 2.f - text_size.min()[1]);
@@ -71,7 +71,7 @@ public:
         Tungsten::bind_vertex_array(vertex_array_);
         buffers_ = Tungsten::generate_buffers(2);
         set_buffers(buffers_[0], buffers_[1], buffer);
-        program_.setup();
+
         Tungsten::set_texture_min_filter(GL_TEXTURE_2D, GL_LINEAR);
         Tungsten::set_texture_mag_filter(GL_TEXTURE_2D, GL_LINEAR);
         Tungsten::set_texture_parameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -102,6 +102,27 @@ public:
                           * Xyz::scale4<float>(float(h) / m, float(w) / m, 1.f);
 
         program_.mvp_matrix.set(projection);
+        program_.color.set({1.0, 1.0, 1.0, 1.0});
+    }
+
+    bool on_event(Tungsten::SdlApplication& app, const SDL_Event& event) override
+    {
+        if (event.type == SDL_WINDOWEVENT
+            && event.window.event == SDL_WINDOWEVENT_RESIZED)
+        {
+            glViewport(0, 0, event.window.data1, event.window.data2);
+
+            auto [w, h] = app.window_size();
+            font_ = make_gl_font(std::move(bmp_font_), {float(w), float(h)});
+            auto text_size = get_text_size(font_, text_);
+            auto origin = Xyz::make_vector2(-text_size.size()[0] / 2.f,
+                                            -text_size.size()[1] / 2.f - text_size.min()[1]);
+            auto buffer = format_text(font_, text_, origin);
+            count_ = int32_t(buffer.indexes.size());
+            set_buffers(buffers_[0], buffers_[1], buffer);
+        }
+
+        return EventLoop::on_event(app, event);
     }
 
     void on_draw(Tungsten::SdlApplication& app) override
@@ -111,7 +132,7 @@ public:
         Tungsten::draw_elements(GL_TRIANGLES, count_, GL_UNSIGNED_SHORT);
     }
 private:
-    BitmapFont bmp_font_;
+    std::shared_ptr<BitmapFont> bmp_font_;
     GlFont font_;
     std::u32string text_;
     std::vector<Tungsten::BufferHandle> buffers_;
@@ -156,17 +177,17 @@ int main(int argc, char* argv[])
         auto text32 = ystring::to_utf32(text8);
         auto chars = get_unique_chars(text32);
 
-        BitmapFont bmp_font;
+        auto bmp_font = std::make_shared<BitmapFont>();
         if (auto bmp_font_arg = args.value("--bmpfont"))
         {
-            bmp_font = read_bitmap_font(bmp_font_arg.as_string());
+            *bmp_font = read_bitmap_font(bmp_font_arg.as_string());
         }
         else if (auto font_arg = args.value("--font"))
         {
             auto parts = font_arg.split(':', 2, 2);
-            bmp_font = make_bitmap_font(parts.value(0).as_string(),
-                                        parts.value(1).as_uint(),
-                                        chars);
+            *bmp_font = make_bitmap_font(parts.value(0).as_string(),
+                                         parts.value(1).as_uint(),
+                                         chars);
         }
         else
         {

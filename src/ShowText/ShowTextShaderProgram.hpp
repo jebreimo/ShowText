@@ -17,6 +17,7 @@ public:
 
     Tungsten::Uniform<Xyz::Matrix4F> mvp_matrix;
     Tungsten::Uniform<GLint> texture;
+    Tungsten::Uniform<Xyz::Vector4F> color;
 
     GLuint position;
     GLuint texture_coord;

@@ -25,4 +25,5 @@ void ShowTextShaderProgram::setup()
 
     mvp_matrix = Tungsten::get_uniform<Xyz::Matrix4F>(program, "u_MvpMatrix");
     texture = Tungsten::get_uniform<GLint>(program, "u_Texture");
+    color = Tungsten::get_uniform<Xyz::Vector4F>(program, "u_TextColor");
 }

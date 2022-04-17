@@ -29,19 +29,23 @@ public:
     GlFont() = default;
 
     GlFont(std::unordered_map<char32_t, GlCharData> char_data,
-           yimage::Image image);
+           std::shared_ptr<BitmapFont> bitmap_font);
 
     [[nodiscard]]
     const GlCharData* char_data(char32_t ch) const;
 
     [[nodiscard]]
     const yimage::Image& image() const;
+
+    [[nodiscard]]
+    const std::shared_ptr<BitmapFont>& bitmap_font() const;
 private:
     std::unordered_map<char32_t, GlCharData> char_data_;
-    yimage::Image image_;
+    std::shared_ptr<BitmapFont> bitmap_font_;
 };
 
-GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size);
+GlFont make_gl_font(std::shared_ptr<BitmapFont> bitmap_font,
+                    Xyz::Vector2F screen_size);
 
 struct TextVertex
 {

@@ -11,9 +11,9 @@
 #include <Ystring/Ystring.hpp>
 
 GlFont::GlFont(std::unordered_map<char32_t, GlCharData> char_data,
-               yimage::Image image)
+               std::shared_ptr<BitmapFont> bitmap_font)
     : char_data_(move(char_data)),
-      image_(std::move(image))
+      bitmap_font_(std::move(bitmap_font))
 {}
 
 const GlCharData* GlFont::char_data(char32_t ch) const
@@ -25,17 +25,23 @@ const GlCharData* GlFont::char_data(char32_t ch) const
 
 const yimage::Image& GlFont::image() const
 {
-    return image_;
+    if (!bitmap_font_)
+        throw std::runtime_error("bitmap_font is NULL");
+    return bitmap_font_->image();
 }
 
-GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size)
+GlFont make_gl_font(std::shared_ptr<BitmapFont> bitmap_font,
+                    Xyz::Vector2F screen_size)
 {
+    if (!bitmap_font)
+        throw std::runtime_error("bitmap_font is NULL");
+
     std::unordered_map<char32_t, GlCharData> char_data;
-    const auto& img = bitmap_font.image();
+    const auto& img = bitmap_font->image();
     if (!img.size())
         throw std::runtime_error("BitmapFont instance doesn't contain an image.");
 
-    for (const auto [ch, data] : bitmap_font.all_char_data())
+    for (const auto [ch, data] : bitmap_font->all_char_data())
     {
         GlCharData gd;
         gd.tex_origin = {float(data.x) / float(img.width()),
@@ -49,7 +55,7 @@ GlFont make_gl_font(BitmapFont bitmap_font, Xyz::Vector2F screen_size)
                       2 * float(data.bearing_y) / screen_size[1]};
         char_data.insert({ch, gd});
     }
-    return {move(char_data), bitmap_font.release_image()};
+    return {move(char_data), move(bitmap_font)};
 }
 
 std::ostream& operator<<(std::ostream& os, const TextVertex& vertex)
@@ -57,9 +63,8 @@ std::ostream& operator<<(std::ostream& os, const TextVertex& vertex)
     return os << vertex.pos << " -- " << vertex.texture;
 }
 
-std::ostream&
-operator<<(std::ostream& os,
-           const Tungsten::ArrayBuffer<TextVertex>& buffer)
+std::ostream& operator<<(std::ostream& os,
+                         const Tungsten::ArrayBuffer<TextVertex>& buffer)
 {
     for (const auto& v: buffer.vertexes)
         os << v << '\n';
