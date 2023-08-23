@@ -17,29 +17,29 @@
 
 namespace
 {
-    std::pair<int, int> get_ogl_pixel_type(yimage::PixelType type)
+    std::pair<int, int> get_ogl_pixel_type(Yimage::PixelType type)
     {
         switch (type)
         {
-        case yimage::PixelType::MONO_8:
+        case Yimage::PixelType::MONO_8:
             return {GL_RED, GL_UNSIGNED_BYTE};
-        case yimage::PixelType::MONO_ALPHA_8:
+        case Yimage::PixelType::MONO_ALPHA_8:
             return {GL_RG, GL_UNSIGNED_BYTE};
-        case yimage::PixelType::RGB_8:
+        case Yimage::PixelType::RGB_8:
             return {GL_RGB, GL_UNSIGNED_BYTE};
-        case yimage::PixelType::RGBA_8:
+        case Yimage::PixelType::RGBA_8:
             return {GL_RGBA, GL_UNSIGNED_BYTE};
-        case yimage::PixelType::MONO_1:
-        case yimage::PixelType::MONO_2:
-        case yimage::PixelType::MONO_4:
-        case yimage::PixelType::MONO_16:
-        case yimage::PixelType::ALPHA_MONO_8:
-        case yimage::PixelType::ALPHA_MONO_16:
-        case yimage::PixelType::MONO_ALPHA_16:
-        case yimage::PixelType::RGB_16:
-        case yimage::PixelType::ARGB_8:
-        case yimage::PixelType::ARGB_16:
-        case yimage::PixelType::RGBA_16:
+        case Yimage::PixelType::MONO_1:
+        case Yimage::PixelType::MONO_2:
+        case Yimage::PixelType::MONO_4:
+        case Yimage::PixelType::MONO_16:
+        case Yimage::PixelType::ALPHA_MONO_8:
+        case Yimage::PixelType::ALPHA_MONO_16:
+        case Yimage::PixelType::MONO_ALPHA_16:
+        case Yimage::PixelType::RGB_16:
+        case Yimage::PixelType::ARGB_8:
+        case Yimage::PixelType::ARGB_16:
+        case Yimage::PixelType::RGBA_16:
         default:
             break;
         }
@@ -53,7 +53,7 @@ class ShowText : public Tungsten::EventLoop
 public:
     ShowText(std::shared_ptr<BitmapFont> font, std::u32string text)
         : bmp_font_(std::move(font)),
-          text_(move(text))
+          text_(std::move(text))
     {}
 
     void on_startup(Tungsten::SdlApplication& app) override
@@ -129,7 +129,7 @@ public:
     {
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Tungsten::draw_elements(GL_TRIANGLES, count_, GL_UNSIGNED_SHORT);
+        Tungsten::draw_triangle_elements_16(0, count_);
     }
 private:
     std::shared_ptr<BitmapFont> bmp_font_;
@@ -198,6 +198,8 @@ int main(int argc, char* argv[])
             std::move(bmp_font),
             text32);
         Tungsten::SdlApplication app("ShowPng", std::move(event_loop));
+        auto params = app.window_parameters();
+        params.gl_parameters.multi_sampling = {1, 2};
         app.read_command_line_options(args);
         app.run();
     }

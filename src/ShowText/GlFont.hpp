@@ -35,10 +35,7 @@ public:
     const GlCharData* char_data(char32_t ch) const;
 
     [[nodiscard]]
-    const yimage::Image& image() const;
-
-    [[nodiscard]]
-    const std::shared_ptr<BitmapFont>& bitmap_font() const;
+    const Yimage::Image& image() const;
 private:
     std::unordered_map<char32_t, GlCharData> char_data_;
     std::shared_ptr<BitmapFont> bitmap_font_;

@@ -12,7 +12,7 @@
 
 GlFont::GlFont(std::unordered_map<char32_t, GlCharData> char_data,
                std::shared_ptr<BitmapFont> bitmap_font)
-    : char_data_(move(char_data)),
+    : char_data_(std::move(char_data)),
       bitmap_font_(std::move(bitmap_font))
 {}
 
@@ -23,7 +23,7 @@ const GlCharData* GlFont::char_data(char32_t ch) const
     return nullptr;
 }
 
-const yimage::Image& GlFont::image() const
+const Yimage::Image& GlFont::image() const
 {
     if (!bitmap_font_)
         throw std::runtime_error("bitmap_font is NULL");
@@ -48,14 +48,14 @@ GlFont make_gl_font(std::shared_ptr<BitmapFont> bitmap_font,
                          float(data.y + data.height) / float(img.height())};
         gd.tex_size = {float(data.width) / float(img.width()),
                        -float(data.height) / float(img.height())};
-        gd.advance = float(2 * float(data.advance) / (64 * screen_size[0]));
-        gd.size = {2 * float(data.width) / screen_size[0],
-                   2 * float(data.height) / screen_size[1]};
-        gd.bearing = {2 * float(data.bearing_x) / screen_size[0],
-                      2 * float(data.bearing_y) / screen_size[1]};
+        gd.advance = 0.75f * float(2 * float(data.advance) / (64 * screen_size[0]));
+        gd.size = {0.75f * 2 * float(data.width) / screen_size[0],
+                   0.75f * 2 * float(data.height) / screen_size[1]};
+        gd.bearing = {0.75f * 2 * float(data.bearing_x) / screen_size[0],
+                      0.75f * 2 * float(data.bearing_y) / screen_size[1]};
         char_data.insert({ch, gd});
     }
-    return {move(char_data), move(bitmap_font)};
+    return {std::move(char_data), std::move(bitmap_font)};
 }
 
 std::ostream& operator<<(std::ostream& os, const TextVertex& vertex)

@@ -6,18 +6,19 @@
 // License text is included with the source distribution.
 //****************************************************************************
 #include "ShowTextShaderProgram.hpp"
+
+#include <Tungsten/ShaderProgramBuilder.hpp>
 #include "ShowText-frag.glsl.hpp"
 #include "ShowText-vert.glsl.hpp"
 
 void ShowTextShaderProgram::setup()
 {
     using namespace Tungsten;
-    program = create_program();
-    auto vertex_shader = create_shader(GL_VERTEX_SHADER, ShowText_vert);
-    attach_shader(program, vertex_shader);
-    auto fragment_shader = create_shader(GL_FRAGMENT_SHADER, ShowText_frag);
-    attach_shader(program, fragment_shader);
-    link_program(program);
+    program = ShaderProgramBuilder()
+        .add_shader(ShaderType::VERTEX, ShowText_vert)
+        .add_shader(ShaderType::FRAGMENT, ShowText_frag)
+        .build();
+
     use_program(program);
 
     position = Tungsten::get_vertex_attribute(program, "a_Position");
